@@ -1,6 +1,9 @@
-# Laporan Proyek Machine Learning - Nama Anda
+# Laporan Proyek Machine Learning - Arif Maulana Insaf
 
 ## Project Overview
+Di era informasi, pembaca dihadapkan pada ribuan pilihan buku, membuat pencarian bacaan yang relevan menjadi tantangan tersendiri. Sistem rekomendasi hadir untuk membantu pengguna menemukan buku yang sesuai dengan minat dan preferensinya secara otomatis. Sistem ini tidak hanya meningkatkan kenyamanan pengguna tetapi juga mendorong peningkatan engagement serta penjualan buku.
+
+Menurut riset [McKinsey](https://www.mckinsey.com/industries/technology-media-and-telecommunications/our-insights/the-future-of-personalization-and-how-to-get-ready-for-it), 35% dari pembelian di Amazon berasal dari sistem rekomendasi. Oleh karena itu, membangun sistem rekomendasi yang akurat sangat penting untuk mengoptimalkan pengalaman pengguna.
 
 Pada bagian ini, Kamu perlu menuliskan latar belakang yang relevan dengan proyek yang diangkat.
 
@@ -26,9 +29,8 @@ Menjelaskan pernyataan masalah:
 ### Goals
 
 Menjelaskan tujuan proyek yang menjawab pernyataan masalah:
-- Jawaban pernyataan masalah 1
-- Jawaban pernyataan masalah 2
-- Jawaban pernyataan masalah n
+- membuat sistem rekomendasi buku berbasis content base filtering
+- Menyediakan alternatif solusi menggunakan pendekatan collaborative filtering.
 
 Semua poin di atas harus diuraikan dengan jelas. Anda bebas menuliskan berapa pernyataan masalah dan juga goals yang diinginkan.
 
@@ -37,6 +39,11 @@ Semua poin di atas harus diuraikan dengan jelas. Anda bebas menuliskan berapa pe
 
     ### Solution statements
     - Mengajukan 2 atau lebih solution approach (algoritma atau pendekatan sistem rekomendasi).
+  
+| solusi | penjelasan |
+|----------------------------|--------------------------------|
+| memakai content base filtering | Merekomendasikan buku yang mirip berdasarkan konten deskriptif seperti penulis, bahasa, penerbit, dan fitur numerik seperti rating dan jumlah ulasan. Model menggunakan TF-IDF dan Cosine Similarity.<br> + Kelebihan: Tidak butuh data pengguna. Cocok untuk cold-start.<br>+ Kelebihan: Tidak butuh data pengguna. Cocok untuk cold-start. |
+
 
 ## Data Understanding
 Paragraf awal bagian ini menjelaskan informasi mengenai jumlah data, kondisi data, dan informasi mengenai data yang digunakan. Sertakan juga sumber atau tautan untuk mengunduh dataset. Contoh: [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Restaurant+%26+consumer+data).
