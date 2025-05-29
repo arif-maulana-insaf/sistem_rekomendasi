@@ -45,8 +45,6 @@ Menjelaskan tujuan proyek yang menjawab pernyataan masalah:
 
 
 ## Data Understanding
-Paragraf awal bagian ini menjelaskan informasi mengenai jumlah data, kondisi data, dan informasi mengenai data yang digunakan. Sertakan juga sumber atau tautan untuk mengunduh dataset. Contoh: [UCI Machine Learning Repository](https://archive.ics.uci.edu/ml/datasets/Restaurant+%26+consumer+data).
-
 dataset yang saya ambil dari kaggle dengan judul `Goodreads-books` 
 
 #### sumber datasaet:
@@ -169,7 +167,12 @@ Semua informasi dikombinasikan menjadi representasi fitur menggunakan:
 - `MinMaxScaler` untuk fitur numerik.
 - `cosine_similarity` untuk menghitung kemiripan antar buku.
 
-#### Output Top-5 Recommendation (contoh: *Harry Potter*):
+## hasil top 3 dari  content base
+| bookID |	title	|authors |	average_rating	| isbn	|isbn13	|language_code|	num_pages	|ratings_count|	text_reviews_count|	publication_date|	publisher|	log_reviews|	combined_features|
+|------|----------|------------|--------------|-------------|--------------|---------|-----------|----------|----------|----------|--------|-------|------|
+|0|	1	|Harry Potter and the Half-Blood Prince (Harry ...	|J.K. Rowling/Mary GrandPré|	4.57|	0439785960	|9780439785969|	eng	|652	|1000000.0	|27591	|9/16/2006|	Scholastic Inc.|	10.225281	|J.K. Rowling/Mary GrandPré Scholastic Inc. eng|
+|1	|2	|Harry Potter and the Order of the Phoenix (Har...	|J.K. Rowling/Mary GrandPré	|4.49|	0439358078	|9780439358071|	eng|	870|	1000000.0|	29221	|9/1/2004|	Scholastic Inc.|	10.282677	|J.K. Rowling/Mary GrandPré Scholastic Inc. eng|
+|2	|4|	Harry Potter and the Chamber of Secrets (Harry...	|J.K. Rowling|	4.42	|0439554896	|9780439554893	|eng	|352	|6333.0|	244	|11/1/2003|	Scholastic	|5.501258|	J.K. Rowling Scholastic eng|
 
 
 #### Kelebihan
@@ -193,12 +196,14 @@ Menggunakan algoritma:
 - Evaluasi menggunakan **Root Mean Square Error (RMSE)**.
 
 #### Output Top-5 Recommendation untuk `user_1`:
-
+| # | hasil |
+|----|-------|
+|1. | II Maccabees (predicted rating: 4.17)|
+|2. |Grizzwold (predicted rating: 4.13)|
+|3.| A Virtuous Woman (predicted rating: 4.11)|
+|4. |Bite Me!: An Unofficial Guide to the World of Buffy the Vampire Slayer (predicted rating: 4.1)|
+|5. |The Last Joy (predicted rating: 4.1)|
 ## Evaluation
-Pada bagian ini Anda perlu menyebutkan metrik evaluasi yang digunakan. Kemudian, jelaskan hasil proyek berdasarkan metrik evaluasi tersebut.
-
-Evaluasi dilakukan untuk mengukur seberapa baik sistem rekomendasi memberikan hasil yang relevan terhadap pengguna. Karena proyek ini menggunakan dua pendekatan yang berbeda, maka metrik evaluasi yang digunakan juga berbeda dan disesuaikan dengan masing-masing metode.
-
 ---
 
 ###  1. Content-Based Filtering Evaluation
@@ -220,7 +225,10 @@ Di mana:
 - Nilai cosine similarity berada dalam rentang **0 sampai 1**
   - 1 → sangat mirip
   - 0 → tidak mirip sama sekali
-#### 📈 Hasil Evaluasi:
+
+
+ 
+#### Hasil Evaluasi:
 Model mampu merekomendasikan buku-buku yang sangat mirip dari segi konten (penulis, genre, popularitas), terutama untuk buku-buku populer seperti "Harry Potter". Namun, model cenderung hanya merekomendasikan buku-buku dari seri yang sama, sehingga eksplorasi terbatas.
 
 ---
@@ -243,7 +251,7 @@ dimana:
 
 
 #### Hasil Evaluasi:
-Model menghasilkan **RMSE = 0.83** pada data uji simulasi. Nilai ini menunjukkan bahwa prediksi cukup dekat dengan nilai sebenarnya, mengingat data yang digunakan adalah hasil random sampling yang terbatas. Dalam konteks data asli (tanpa rating user), RMSE ini bersifat ilustratif.
+Model menghasilkan **RMSE = 0.65** pada data uji simulasi. Nilai ini menunjukkan bahwa prediksi cukup dekat dengan nilai sebenarnya, mengingat data yang digunakan adalah hasil random sampling yang terbatas. Dalam konteks data asli (tanpa rating user), RMSE ini bersifat ilustratif.
 
 ---
 
@@ -251,8 +259,11 @@ Model menghasilkan **RMSE = 0.83** pada data uji simulasi. Nilai ini menunjukkan
 
 | Pendekatan            | Metrik         | Nilai       | Interpretasi                                                  |
 |-----------------------|----------------|-------------|---------------------------------------------------------------|
-| Content-Based         | Cosine Similarity | Top-N hasil | Memberikan hasil relevan, tapi eksplorasi terbatas             |
-| Collaborative (SVD)   | RMSE           | 0.75        | Prediksi cukup akurat meskipun dengan data simulasi sederhana |
+| Content-Based         | Cosine Similarity | Top-N hasil | Memberikan hasil relevan berdasarkan kemiripan konten, namun eksplorasi terbatas pada variasi buku            |
+| Collaborative (SVD)   | RMSE           | 0.65        | 	Prediksi rating cukup akurat pada data simulasi, menunjukkan potensi untuk rekomendasi berdasarkan pola pengguna |
+
+
+
 
 Evaluasi menunjukkan bahwa kedua pendekatan memiliki potensi yang kuat dan bisa saling melengkapi dalam sistem rekomendasi hybrid yang lebih robust.
 
