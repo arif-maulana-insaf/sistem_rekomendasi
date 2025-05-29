@@ -197,8 +197,6 @@ Menggunakan algoritma:
 ## Evaluation
 Pada bagian ini Anda perlu menyebutkan metrik evaluasi yang digunakan. Kemudian, jelaskan hasil proyek berdasarkan metrik evaluasi tersebut.
 
-##  Evaluation
-
 Evaluasi dilakukan untuk mengukur seberapa baik sistem rekomendasi memberikan hasil yang relevan terhadap pengguna. Karena proyek ini menggunakan dua pendekatan yang berbeda, maka metrik evaluasi yang digunakan juga berbeda dan disesuaikan dengan masing-masing metode.
 
 ---
