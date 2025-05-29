@@ -146,6 +146,68 @@ Pada bagian ini Anda menerapkan dan menyebutkan teknik data preparation yang dil
 | 10 | random sampling | buat data untuk collaborative filtering |
 | 11 | split data set, svd | evaluasi akurasi sistem rekomendasi | 
 
+## 1. load data
+```python
+df = pd.read_csv('books.csv', on_bad_lines='skip')
+df.head()
+```
+pada bagian ini saya menambahkan on_bad_line='skip' karena pada data tersebut data yang rusak sehingga data perlu diskip
+
+## 2. menghapus spasi
+```python
+df.columns = df.columns.str.strip()
+```
+karena terdapat spasi yang pada column `num_pages` sehingga saat column di panggil mengalami error oleh karena itu saya menghapus spasinya
+
+## 3. capping pada column
+```python
+df['ratings_count'] = np.where(df['ratings_count'] > 1e6, 1e6, df['ratings_count'])
+```
+Melakukan capping pada kolom ratings_count. Jika ada buku yang memiliki jumlah rating lebih dari 1 juta (1e6), nilainya akan diubah menjadi 1 juta. Ini dilakukan untuk mengurangi pengaruh outlier yang sangat ekstrem dan membuat distribusi data lebih terkelola.
+
+## 4. log transform
+```
+df['log_reviews'] = np.log1p(df['text_reviews_count'])
+```
+Menerapkan transformasi logaritma (np.log1p yang berarti log(1+x)) pada kolom text_reviews_count. Transformasi ini sering digunakan untuk data yang sangat miring (skewed) seperti jumlah ulasan, sehingga distribusinya menjadi lebih mendekati normal dan lebih baik untuk model machine learning.
+
+## 5. content base filtering
+```python
+df['combined_features'] = df['authors'] + ' ' + df['publisher'] + ' ' + df['language_code']
+```
+Membuat kolom baru bernama combined_features yang menggabungkan informasi dari kolom authors, publisher, dan language_code. Fitur gabungan ini akan digunakan sebagai representasi tekstual dari setiap buku.
+
+```python
+vectorizer = TfidfVectorizer(stop_words='english')
+tfidf_matrix = vectorizer.fit_transform(df['combined_features'])
+```
+- TfidfVectorizer(stop_words='english'): Menginisialisasi TfidfVectorizer. TF-IDF (Term Frequency-Inverse Document Frequency) adalah teknik yang mengkonversi teks menjadi representasi numerik, di mana kata-kata yang lebih sering muncul dalam satu dokumen tetapi jarang di seluruh korpus akan memiliki bobot lebih tinggi. stop_words='english' akan menghapus kata-kata umum dalam bahasa Inggris (seperti "the", "a", "is") yang tidak banyak membantu dalam menentukan kemiripan.
+- tfidf_matrix = vectorizer.fit_transform(df['combined_features']): Mengaplikasikan TF-IDF vectorizer ke kolom combined_features untuk membuat matriks TF-IDF. Setiap baris dalam matriks ini merepresentasikan sebuah buku, dan setiap kolom merepresentasikan bobot TF-IDF dari sebuah kata.
+
+```python
+final_features = hstack([tfidf_matrix, num_features_scaled])
+similarity_matrix = cosine_similarity(final_features, final_features)
+```
+ Menggabungkan matriks TF-IDF (representasi teks) dengan fitur numerik yang sudah diskalakan. Menghitung matriks kemiripan kosinus antar semua buku. Matriks ini akan memiliki ukuran N x N (N = jumlah buku), di mana setiap sel (i, j) berisi skor kemiripan antara buku i dan buku j.
+
+ ## collaborative filtering dengan data dummy
+ ```python
+import random
+
+book_ids = df['bookID'].sample(100, random_state=42).tolist()
+dummy_data = []
+
+for user_id in range(1, 11):
+    sampled_books = random.sample(book_ids, 10)
+    for book_id in sampled_books:
+        rating = round(random.uniform(3, 5), 1)
+        dummy_data.append([f"user_{user_id}", book_id, rating])
+
+df_rating = pd.DataFrame(dummy_data, columns=['user_id', 'book_id', 'rating'])
+```
+karena pada  dataset tidak memiliki data rating dari pengguna asli karena saya akan mengimplentasikan ke library `suprise` yang mana membutuhkan data dalam format triad: (user_id, item_id, rating)
+
+
 ## Modeling
 Tahapan ini membahas mengenai model sisten rekomendasi yang Anda buat untuk menyelesaikan permasalahan. Sajikan top-N recommendation sebagai output.
 
