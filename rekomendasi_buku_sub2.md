@@ -139,10 +139,9 @@ Pada bagian ini Anda menerapkan dan menyebutkan teknik data preparation yang dil
 | 3 | capping outlier | banyak fitur yang memiliki distribusi yang sangat miring |
 | 4 | log tranform | membantu mengurangi pengarih extrem sehingga model tidak bias terhadap buku populer saja |
 | 5 | memakai combine_features ke tfidf | untuk membuat representasi dari content based |
-| 6 | minmaxscaler | untuk mengkombinasikan fitur numerik yaitu `average_rating`, `num_pages`, `ratings_count`, `text_review_count` |
+| 6 | minmaxscaler | untuk mengkombinasikan fitur numerik yaitu<br> `average_rating`= adalah sebagai rata-rata rating yaitu indikator kualitas buku<br>, `num_pages`= halaman pada buku yang bisa mempengaruhi prefensi pembaca<br>, `ratings_count`= total jumlah rating yaitu cerminan popularitas<br> , `text_review_count`= pengukur engagement pembaca |
 | 7 | hstack  | hstuck(horizontal stack) untuk menggabungkan kolom-kolom baru ke kanan |
-| 8 | random sampling | buat data untuk collaborative filtering |
-| 9 | normalisasi column title menggunakan lower(), strip() | dengan menggunakan lower() judul pada column title akan di ubah menjadi kecil semua, strip() menghilangkan spasi ini dibutuhkan agar sistem menjadi lebih robust terhadap variasi | 
+| 8 | normalisasi column title menggunakan lower(), strip() | dengan menggunakan lower() judul pada column title akan di ubah menjadi kecil semua, strip() menghilangkan spasi ini dibutuhkan agar sistem menjadi lebih robust terhadap variasi | 
 
 
 ## 1. load data
@@ -212,13 +211,15 @@ Semua informasi dikombinasikan menjadi representasi fitur menggunakan:
 - `MinMaxScaler` untuk fitur numerik.
 - `cosine_similarity` untuk menghitung kemiripan antar buku.
 
-## hasil top 3 dari  content base
-| bookID |	title	|authors |	average_rating	| isbn	|isbn13	|language_code|	num_pages	|ratings_count|	text_reviews_count|	publication_date|	publisher|	log_reviews|	combined_features|
-|------|----------|------------|--------------|-------------|--------------|---------|-----------|----------|----------|----------|--------|-------|------|
-|0|	1	|Harry Potter and the Half-Blood Prince (Harry ...	|J.K. Rowling/Mary GrandPré|	4.57|	0439785960	|9780439785969|	eng	|652	|1000000.0	|27591	|9/16/2006|	Scholastic Inc.|	10.225281	|J.K. Rowling/Mary GrandPré Scholastic Inc. eng|
-|1	|2	|Harry Potter and the Order of the Phoenix (Har...	|J.K. Rowling/Mary GrandPré	|4.49|	0439358078	|9780439358071|	eng|	870|	1000000.0|	29221	|9/1/2004|	Scholastic Inc.|	10.282677	|J.K. Rowling/Mary GrandPré Scholastic Inc. eng|
-|2	|4|	Harry Potter and the Chamber of Secrets (Harry...	|J.K. Rowling|	4.42	|0439554896	|9780439554893	|eng	|352	|6333.0|	244	|11/1/2003|	Scholastic	|5.501258|	J.K. Rowling Scholastic eng|
+## hasil top 5 dari  content base
 
+| index | title | author | average_rating |
+|------|--------|--------|--------------|
+| 6266 |The History of Middle-Earth Index (The History of Middle-Earth #13)| 	J.R.R. Tolkien/Christopher Tolkien| 4.25 |
+| 2035 | The Treason of Isengard: The History of The Lord of the Rings Part Two (The History of Middle-earth #7) | 	J.R.R. Tolkien/Christopher Tolkien | 4.17 |
+| 6267 | 	The Lost Road and Other Writings (The History of Middle-earth #5) | 	J.R.R. Tolkien/Christopher Tolkien | 3.97 |
+| 2032 | The Monsters and the Critics and Other Essays | 	J.R.R. Tolkien/Christopher Tolkien | 3.93 |
+| 5256 | 	The Silmarillion | J.R.R. Tolkien/Christopher Tolkien | 3.92 |
 
 #### Kelebihan
 - Tidak membutuhkan data user-rating.
@@ -262,6 +263,9 @@ Di mana:
 | The Da Vinci Code | ya | 11 | 0.80 | 0.40 | 0.53 |4 dari 5 rekomendasi benar (karya Dan Brown atau terkait) akan tetapi Recall rendah (0.40) berarti hanya 40% buku relevan yang terdeteksi |
 | Non-Existent Book | tidak | - | - | - | - | Sistem berhasil mengidentifikasi buku tidak ada. karena title tidak ada di dataset |
 
+- `precision_at_k(recommended_items, relevant_items, k)` = Mengukur seberapa banyak dari rekomendasi Top-k yang benar-benar relevan.
+- `recall_at_k(recommended_items, relevant_items, k)` = Mengukur seberapa banyak item relevan yang berhasil ditemukan dari seluruh item relevan yang mungkin.
+- `f1_at_k(precision, recall)` = Menggabungkan precision dan recall menjadi satu skor tunggal.
 
 #### Hasil Evaluasi:
 Model mampu merekomendasikan buku-buku yang sangat mirip dari segi konten (penulis, genre, popularitas), terutama untuk buku-buku populer seperti "Harry Potter". Namun, model cenderung hanya merekomendasikan buku-buku dari seri yang sama, sehingga eksplorasi terbatas.
