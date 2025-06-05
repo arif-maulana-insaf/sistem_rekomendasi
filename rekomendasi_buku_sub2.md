@@ -41,7 +41,6 @@ Menjelaskan tujuan proyek yang menjawab pernyataan masalah:
 | solusi | penjelasan |
 |----------------------------|--------------------------------|
 | memakai content base filtering | Merekomendasikan buku yang mirip berdasarkan konten deskriptif seperti penulis, bahasa, penerbit, dan fitur numerik seperti rating dan jumlah ulasan. Model menggunakan TF-IDF dan Cosine Similarity.|
-|collaborative filtering | merekomendasikan buku seusai dengan kebiasaan pengguna dengan model menggunakan matrix factorization(svd). |
 
 
 ## Data Understanding
@@ -72,6 +71,10 @@ dataset yang saya ambil dari kaggle dengan judul `Goodreads-books`
 | text_review_count | int | Jumlah total teks tertulis yang mengulas buku yang diterima. |
 | publication_date | object | tanggal publiskasi |
 | publisher | object | yang mempublkasikan |
+
+#### cek nilai nunique
+
+#### cek nilai unique
 
 #### univariate
 
@@ -136,15 +139,14 @@ Pada bagian ini Anda menerapkan dan menyebutkan teknik data preparation yang dil
 |---|------------------------|-------|
 | 1 | menerapkan on_bad_lines='skip' pada read_csv | karena terdapat data yang rusak sehingga jika ingin menginput data bagian yang rusak di skip |
 | 2 | menerapkan strip() pada dataframe | karena terdapat masalah pada column num_page yang mana culum tersebut terdapat spasi yang harus di hilangkan |
-| 3 | cek nilai nunique | mengecek jumlah nilai unik dalam column |
-| 4 | cek nilai unique | mengecek daftar ini dari nilai unik dalam column |
-| 5 | capping outlier | banyak fitur yang memiliki distribusi yang sangat miring |
-| 6 | log tranform | membantu mengurangi pengarih extrem sehingga model tidak bias terhadap buku populer saja |
-| 7 | memakai combine_features ke tfidf | untuk membuat representasi dari content based |
-| 8 | minmaxscaler | untuk mengkombinasikan fitur numerik yaitu `average_rating`, `num_pages`, `ratings_count`, `text_review_count` |
-| 9 | menggabungkan hstack dan consine similar | untuk membangun represenitasi komperhensif |
-| 10 | random sampling | buat data untuk collaborative filtering |
-| 11 | split data set, svd | evaluasi akurasi sistem rekomendasi | 
+| 3 | capping outlier | banyak fitur yang memiliki distribusi yang sangat miring |
+| 4 | log tranform | membantu mengurangi pengarih extrem sehingga model tidak bias terhadap buku populer saja |
+| 5 | memakai combine_features ke tfidf | untuk membuat representasi dari content based |
+| 6 | minmaxscaler | untuk mengkombinasikan fitur numerik yaitu `average_rating`, `num_pages`, `ratings_count`, `text_review_count` |
+| 7 | hstack  | hstuck(horizontal stack) untuk menggabungkan kolom-kolom baru ke kanan |
+| 8 | random sampling | buat data untuk collaborative filtering |
+| 9 | normalisasi column title menggunakan lower(), strip() | dengan menggunakan lower() judul pada column title akan di ubah menjadi kecil semua, strip() menghilangkan spasi ini dibutuhkan agar sistem menjadi lebih robust terhadap variasi | 
+
 
 ## 1. load data
 ```python
@@ -186,32 +188,16 @@ tfidf_matrix = vectorizer.fit_transform(df['combined_features'])
 
 ```python
 final_features = hstack([tfidf_matrix, num_features_scaled])
-similarity_matrix = cosine_similarity(final_features, final_features)
 ```
- Menggabungkan matriks TF-IDF (representasi teks) dengan fitur numerik yang sudah diskalakan. Menghitung matriks kemiripan kosinus antar semua buku. Matriks ini akan memiliki ukuran N x N (N = jumlah buku), di mana setiap sel (i, j) berisi skor kemiripan antara buku i dan buku j.
-
- ## collaborative filtering dengan data dummy
- ```python
-import random
-
-book_ids = df['bookID'].sample(100, random_state=42).tolist()
-dummy_data = []
-
-for user_id in range(1, 11):
-    sampled_books = random.sample(book_ids, 10)
-    for book_id in sampled_books:
-        rating = round(random.uniform(3, 5), 1)
-        dummy_data.append([f"user_{user_id}", book_id, rating])
-
-df_rating = pd.DataFrame(dummy_data, columns=['user_id', 'book_id', 'rating'])
-```
-karena pada  dataset tidak memiliki data rating dari pengguna asli karena saya akan mengimplentasikan ke library `suprise` yang mana membutuhkan data dalam format triad: (user_id, item_id, rating)
+Menggabungkan dua jenis fitur menjadi satu matriks besar untuk digunakan dalam perhitungan kemiripan:
+- `tfidf_matrix`: representasi fitur teks (seperti penulis, penerbit, bahasa) yang diubah jadi vektor menggunakan TF-IDF.
+- `num_features_scaled`: representasi fitur numerik (seperti rating rata-rata, jumlah halaman, jumlah review) yang sudah diskalakan.
 
 
 ## Modeling
 Tahapan ini membahas mengenai model sisten rekomendasi yang Anda buat untuk menyelesaikan permasalahan. Sajikan top-N recommendation sebagai output.
 
-Tahapan ini menjelaskan pembuatan sistem rekomendasi untuk membantu pengguna menemukan buku yang relevan berdasarkan data yang tersedia. Kami menggunakan **dua pendekatan berbeda** agar sistem lebih komprehensif: **Content-Based Filtering** dan **Collaborative Filtering**.
+Tahapan ini menjelaskan pembuatan sistem rekomendasi untuk membantu pengguna menemukan buku yang relevan berdasarkan data yang tersedia. Kami menggunakan **satu pendekatan** yaitu: **Content-Based Filtering** 
 
 ---
 
@@ -248,23 +234,6 @@ Semua informasi dikombinasikan menjadi representasi fitur menggunakan:
 
 ---
 
-### 2. Collaborative Filtering (CF) - Matrix Factorization (SVD)
-
-#### Penjelasan
-Pendekatan ini merekomendasikan buku berdasarkan pola rating dari pengguna lain. Karena data pengguna tidak tersedia, kami menggunakan **dummy dataset** (10 user × 10 buku) dengan rating acak.
-
-Menggunakan algoritma:
-- `SVD (Singular Value Decomposition)` dari library `surprise`.
-- Evaluasi menggunakan **Root Mean Square Error (RMSE)**.
-
-#### Output Top-5 Recommendation untuk `user_1`:
-| # | hasil |
-|----|-------|
-|1. | II Maccabees (predicted rating: 4.17)|
-|2. |Grizzwold (predicted rating: 4.13)|
-|3.| A Virtuous Woman (predicted rating: 4.11)|
-|4. |Bite Me!: An Unofficial Guide to the World of Buffy the Vampire Slayer (predicted rating: 4.1)|
-|5. |The Last Joy (predicted rating: 4.1)|
 ## Evaluation
 ---
 
@@ -272,7 +241,7 @@ Menggunakan algoritma:
 
 ####  Metrik: Cosine Similarity
 
-Pendekatan content-based menggunakan **cosine similarity** untuk mengukur kemiripan antar buku. Semakin tinggi skor cosine similarity, semakin mirip dua buku berdasarkan fitur yang digunakan.
+Model menggunakan cosine similarity untuk menghitung kemiripan antar item. Untuk evaluasi kualitas rekomendasi, digunakan metrik Precision_K dan Recall_K, yang mengukur relevansi hasil rekomendasi dibandingkan dengan preferensi pengguna sebenarnya.
 
 ####  Formula Cosine Similarity:
 
@@ -288,41 +257,32 @@ Di mana:
   - 1 → sangat mirip
   - 0 → tidak mirip sama sekali
 
+### hasil evaluasi 
 
+| judul | ditemukan | jumlah yang relevan | Precision@5 | Recall@5 | F1 Score@5 | kesimpulan | 
+|------|------------|-----------------------|-------------|----------|-------------|--------|
+| The Hobbit | ya | 16 | 0.00 | 0.00 | 0.00 |Sistem memberikan 5 rekomendasi, tetapi tidak ada yang termasuk dalam buku relevan (karya penulis yang sama). |
+| The Da Vinci Code | ya | 11 | 0.80 | 0.40 | 0.53 |4 dari 5 rekomendasi benar (karya Dan Brown atau terkait) akan tetapi Recall rendah (0.40) berarti hanya 40% buku relevan yang terdeteksi |
+| Non-Existent Book | tidak | - | - | - | - | Sistem berhasil mengidentifikasi buku tidak ada. karena title tidak ada di dataset |
+
+## hasil top n dari  content base
+| bookID |	title	|authors |	average_rating	| isbn	|isbn13	|language_code|	num_pages	|ratings_count|	text_reviews_count|	publication_date|	publisher|	log_reviews|	combined_features|
+|------|----------|------------|--------------|-------------|--------------|---------|-----------|----------|----------|----------|--------|-------|------|
+|0|	1	|Harry Potter and the Half-Blood Prince (Harry ...	|J.K. Rowling/Mary GrandPré|	4.57|	0439785960	|9780439785969|	eng	|652	|1000000.0	|27591	|9/16/2006|	Scholastic Inc.|	10.225281	|J.K. Rowling/Mary GrandPré Scholastic Inc. eng|
+|1	|2	|Harry Potter and the Order of the Phoenix (Har...	|J.K. Rowling/Mary GrandPré	|4.49|	0439358078	|9780439358071|	eng|	870|	1000000.0|	29221	|9/1/2004|	Scholastic Inc.|	10.282677	|J.K. Rowling/Mary GrandPré Scholastic Inc. eng|
+|2	|4|	Harry Potter and the Chamber of Secrets (Harry...	|J.K. Rowling|	4.42	|0439554896	|9780439554893	|eng	|352	|6333.0|	244	|11/1/2003|	Scholastic	|5.501258|	J.K. Rowling Scholastic eng|
  
 #### Hasil Evaluasi:
 Model mampu merekomendasikan buku-buku yang sangat mirip dari segi konten (penulis, genre, popularitas), terutama untuk buku-buku populer seperti "Harry Potter". Namun, model cenderung hanya merekomendasikan buku-buku dari seri yang sama, sehingga eksplorasi terbatas.
 
 ---
 
-###  2. Collaborative Filtering Evaluation (SVD)
-
-#### Metrik: Root Mean Square Error (RMSE)
-
-Untuk model **Collaborative Filtering** menggunakan **Singular Value Decomposition (SVD)**, evaluasi dilakukan dengan membandingkan prediksi rating terhadap data aktual menggunakan RMSE.
-
-**Formula**:
-```
-RMSE = √(Σ(r_ui - ř_ui)² / N)
-```
-
-dimana:
-- r_ui: rating aktual user u untuk item i
-- ř_ui: rating prediksi user u untuk item i  
-- N: jumlah prediksi
 
 
-#### Hasil Evaluasi:
-Model menghasilkan **RMSE = 0.65** pada data uji simulasi. Nilai ini menunjukkan bahwa prediksi cukup dekat dengan nilai sebenarnya, mengingat data yang digunakan adalah hasil random sampling yang terbatas. Dalam konteks data asli (tanpa rating user), RMSE ini bersifat ilustratif.
 
----
 
-### Kesimpulan Evaluasi
 
-| Pendekatan            | Metrik         | Nilai       | Interpretasi                                                  |
-|-----------------------|----------------|-------------|---------------------------------------------------------------|
-| Content-Based         | Cosine Similarity | Top-N hasil | Memberikan hasil relevan berdasarkan kemiripan konten, namun eksplorasi terbatas pada variasi buku            |
-| Collaborative (SVD)   | RMSE           | 0.65        | 	Prediksi rating cukup akurat pada data simulasi, menunjukkan potensi untuk rekomendasi berdasarkan pola pengguna |
+
 
 
 
