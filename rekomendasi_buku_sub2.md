@@ -265,13 +265,7 @@ Di mana:
 | The Da Vinci Code | ya | 11 | 0.80 | 0.40 | 0.53 |4 dari 5 rekomendasi benar (karya Dan Brown atau terkait) akan tetapi Recall rendah (0.40) berarti hanya 40% buku relevan yang terdeteksi |
 | Non-Existent Book | tidak | - | - | - | - | Sistem berhasil mengidentifikasi buku tidak ada. karena title tidak ada di dataset |
 
-## hasil top n dari  content base
-| bookID |	title	|authors |	average_rating	| isbn	|isbn13	|language_code|	num_pages	|ratings_count|	text_reviews_count|	publication_date|	publisher|	log_reviews|	combined_features|
-|------|----------|------------|--------------|-------------|--------------|---------|-----------|----------|----------|----------|--------|-------|------|
-|0|	1	|Harry Potter and the Half-Blood Prince (Harry ...	|J.K. Rowling/Mary GrandPré|	4.57|	0439785960	|9780439785969|	eng	|652	|1000000.0	|27591	|9/16/2006|	Scholastic Inc.|	10.225281	|J.K. Rowling/Mary GrandPré Scholastic Inc. eng|
-|1	|2	|Harry Potter and the Order of the Phoenix (Har...	|J.K. Rowling/Mary GrandPré	|4.49|	0439358078	|9780439358071|	eng|	870|	1000000.0|	29221	|9/1/2004|	Scholastic Inc.|	10.282677	|J.K. Rowling/Mary GrandPré Scholastic Inc. eng|
-|2	|4|	Harry Potter and the Chamber of Secrets (Harry...	|J.K. Rowling|	4.42	|0439554896	|9780439554893	|eng	|352	|6333.0|	244	|11/1/2003|	Scholastic	|5.501258|	J.K. Rowling Scholastic eng|
- 
+
 #### Hasil Evaluasi:
 Model mampu merekomendasikan buku-buku yang sangat mirip dari segi konten (penulis, genre, popularitas), terutama untuk buku-buku populer seperti "Harry Potter". Namun, model cenderung hanya merekomendasikan buku-buku dari seri yang sama, sehingga eksplorasi terbatas.
 
