@@ -72,9 +72,6 @@ dataset yang saya ambil dari kaggle dengan judul `Goodreads-books`
 | publication_date | object | tanggal publiskasi |
 | publisher | object | yang mempublkasikan |
 
-#### cek nilai nunique
-
-#### cek nilai unique
 
 #### univariate
 
