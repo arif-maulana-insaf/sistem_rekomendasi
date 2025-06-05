@@ -267,8 +267,7 @@ Di mana:
 - `recall_at_k(recommended_items, relevant_items, k)` = Mengukur seberapa banyak item relevan yang berhasil ditemukan dari seluruh item relevan yang mungkin.
 - `f1_at_k(precision, recall)` = Menggabungkan precision dan recall menjadi satu skor tunggal.
 
-#### Hasil Evaluasi:
-Model mampu merekomendasikan buku-buku yang sangat mirip dari segi konten (penulis, genre, popularitas), terutama untuk buku-buku populer seperti "Harry Potter". Namun, model cenderung hanya merekomendasikan buku-buku dari seri yang sama, sehingga eksplorasi terbatas.
+
 
 ---
 
