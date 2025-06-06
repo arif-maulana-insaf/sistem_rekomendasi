@@ -137,11 +137,10 @@ Pada bagian ini Anda menerapkan dan menyebutkan teknik data preparation yang dil
 | 1 | menerapkan on_bad_lines='skip' pada read_csv | karena terdapat data yang rusak sehingga jika ingin menginput data bagian yang rusak di skip |
 | 2 | menerapkan strip() pada dataframe | karena terdapat masalah pada column num_page yang mana culum tersebut terdapat spasi yang harus di hilangkan |
 | 3 | capping outlier | banyak fitur yang memiliki distribusi yang sangat miring |
-| 4 | log tranform | membantu mengurangi pengarih extrem sehingga model tidak bias terhadap buku populer saja |
-| 5 | memakai combine_features ke tfidf | untuk membuat representasi dari content based |
-| 6 | minmaxscaler | untuk mengkombinasikan fitur numerik yaitu<br> `average_rating`= adalah sebagai rata-rata rating yaitu indikator kualitas buku<br>, `num_pages`= halaman pada buku yang bisa mempengaruhi prefensi pembaca<br>, `ratings_count`= total jumlah rating yaitu cerminan popularitas<br> , `text_review_count`= pengukur engagement pembaca |
-| 7 | hstack  | hstuck(horizontal stack) untuk menggabungkan kolom-kolom baru ke kanan |
-| 8 | normalisasi column title menggunakan lower(), strip() | dengan menggunakan lower() judul pada column title akan di ubah menjadi kecil semua, strip() menghilangkan spasi ini dibutuhkan agar sistem menjadi lebih robust terhadap variasi | 
+| 4 | memakai combine_features ke tfidf | untuk membuat representasi dari content based |
+| 5 | minmaxscaler | untuk mengkombinasikan fitur numerik yaitu<br> `average_rating`= adalah sebagai rata-rata rating yaitu indikator kualitas buku<br>, `num_pages`= halaman pada buku yang bisa mempengaruhi prefensi pembaca<br>, `ratings_count`= total jumlah rating yaitu cerminan popularitas<br> , `text_review_count`= pengukur engagement pembaca |
+| 6 | hstack  | hstuck(horizontal stack) untuk menggabungkan kolom-kolom baru ke kanan |
+| 7 | normalisasi column title menggunakan lower(), strip() | dengan menggunakan lower() judul pada column title akan di ubah menjadi kecil semua, strip() menghilangkan spasi ini dibutuhkan agar sistem menjadi lebih robust terhadap variasi | 
 
 
 ## 1. load data
@@ -163,13 +162,8 @@ df['ratings_count'] = np.where(df['ratings_count'] > 1e6, 1e6, df['ratings_count
 ```
 Melakukan capping pada kolom ratings_count. Jika ada buku yang memiliki jumlah rating lebih dari 1 juta (1e6), nilainya akan diubah menjadi 1 juta. Ini dilakukan untuk mengurangi pengaruh outlier yang sangat ekstrem dan membuat distribusi data lebih terkelola.
 
-## 4. log transform
-```
-df['log_reviews'] = np.log1p(df['text_reviews_count'])
-```
-Menerapkan transformasi logaritma (np.log1p yang berarti log(1+x)) pada kolom text_reviews_count. Transformasi ini sering digunakan untuk data yang sangat miring (skewed) seperti jumlah ulasan, sehingga distribusinya menjadi lebih mendekati normal dan lebih baik untuk model machine learning.
 
-## 5. content base filtering
+## 4. content base filtering
 ```python
 df['combined_features'] = df['authors'] + ' ' + df['publisher'] + ' ' + df['language_code']
 ```
@@ -211,15 +205,30 @@ Semua informasi dikombinasikan menjadi representasi fitur menggunakan:
 - `MinMaxScaler` untuk fitur numerik.
 - `cosine_similarity` untuk menghitung kemiripan antar buku.
 
-## hasil top 5 dari  content base
+####  Formula Cosine Similarity:
 
-| index | title | author | average_rating |
-|------|--------|--------|--------------|
-| 6266 |The History of Middle-Earth Index (The History of Middle-Earth #13)| 	J.R.R. Tolkien/Christopher Tolkien| 4.25 |
-| 2035 | The Treason of Isengard: The History of The Lord of the Rings Part Two (The History of Middle-earth #7) | 	J.R.R. Tolkien/Christopher Tolkien | 4.17 |
-| 6267 | 	The Lost Road and Other Writings (The History of Middle-earth #5) | 	J.R.R. Tolkien/Christopher Tolkien | 3.97 |
-| 2032 | The Monsters and the Critics and Other Essays | 	J.R.R. Tolkien/Christopher Tolkien | 3.93 |
-| 5256 | 	The Silmarillion | J.R.R. Tolkien/Christopher Tolkien | 3.92 |
+```
+cosine_similarity = (A · B) / (||A|| * ||B||)
+```
+
+Di mana:
+- `A · B` = perkalian dot product antara vektor A dan B  
+- `||A||` = panjang (norma) vektor A  
+- `||B||` = panjang (norma) vektor B  
+- Nilai cosine similarity berada dalam rentang **0 sampai 1**
+  - 1 → sangat mirip
+  - 0 → tidak mirip sama sekali
+
+###  Top 5 Rekomendasi untuk **"The Hobbit"**
+
+| No. | Judul Buku                                                                                                                                                 | Penulis                                 | Rata-rata Rating |
+|-----|------------------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------|------------------|
+| 1   | The History of Middle-Earth Index (The History of Middle-Earth  #13)                                                                                      | J.R.R. Tolkien / Christopher Tolkien     | 4.25             |
+| 2   | The Treason of Isengard: The History of The Lord of the Rings  Part Two (The History of Middle-earth  #7)                                                | J.R.R. Tolkien / Christopher Tolkien     | 4.17             |
+| 3   | The Lost Road and Other Writings (The History of Middle-earth  #5)                                                                                        | J.R.R. Tolkien / Christopher Tolkien     | 3.97             |
+| 4   | The Monsters and the Critics and Other Essays                                                                                                             | J.R.R. Tolkien / Christopher Tolkien     | 3.93             |
+| 5   | The Silmarillion                                                                                                                                           | J.R.R. Tolkien / Christopher Tolkien     | 3.92             |
+
 
 #### Kelebihan
 - Tidak membutuhkan data user-rating.
@@ -237,23 +246,7 @@ Semua informasi dikombinasikan menjadi representasi fitur menggunakan:
 
 ###  1. Content-Based Filtering Evaluation
 
-####  Metrik: Cosine Similarity
 
-Model menggunakan cosine similarity untuk menghitung kemiripan antar item. Untuk evaluasi kualitas rekomendasi, digunakan metrik Precision_K dan Recall_K, yang mengukur relevansi hasil rekomendasi dibandingkan dengan preferensi pengguna sebenarnya.
-
-####  Formula Cosine Similarity:
-
-```
-cosine_similarity = (A · B) / (||A|| * ||B||)
-```
-
-Di mana:
-- `A · B` = perkalian dot product antara vektor A dan B  
-- `||A||` = panjang (norma) vektor A  
-- `||B||` = panjang (norma) vektor B  
-- Nilai cosine similarity berada dalam rentang **0 sampai 1**
-  - 1 → sangat mirip
-  - 0 → tidak mirip sama sekali
 
 ### hasil evaluasi 
 
